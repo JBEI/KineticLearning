@@ -4,6 +4,7 @@ from mpl_toolkits.axes_grid1 import AxesGrid
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from sklearn.decomposition import PCA
 from sklearn.model_selection import learning_curve
+import seaborn as sns
 import numpy as np
 
 
@@ -187,7 +188,7 @@ def plot_model_fit(name,predicted,actual,log=False):
     plt.xlabel('Predicted ' + name)
     plt.ylabel('Actual ' + name)
     
-    plt.show()
+    #plt.show()
     
     
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
