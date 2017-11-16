@@ -53,7 +53,7 @@ def mlode(modelDict, df, targets, specific_features,time_index='Time (h)'):
                 feature = feature[1]
             interpFun[feature] = interp1d(X,y)
     
-    print(targets)
+    #print(targets)
     
     #Define the function to integrate
     def f(x,t):
@@ -61,7 +61,7 @@ def mlode(modelDict, df, targets, specific_features,time_index='Time (h)'):
         #Generate Derivatives for Each Target
         for target in targets:
             x_pred = []
-            for feature in specific_features[target]:
+            for feature in df.columns:
                 
                 #If the Feature is dynamically changing, use the Dynamic Value
                 if feature in targets:
