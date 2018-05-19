@@ -13,8 +13,8 @@ These notebooks are generally less well maintained than the demo notebooks.  The
 
 * [ManuscriptNotebook.ipynb](ManuscriptNotebook.ipynb) - Reproduces a bulk of the analysis from the paper.
 
-* [Create Data Set.ipynb](Create\ Data\ Set.ipynb) - Creates simulated strain data based on a hand built model of the metabolic pathway that results in the production of Limonene from Acetyl-CoA. 
+* [Create Data Set.ipynb](Create%20Data%20Set.ipynb) - Creates simulated strain data based on a hand built model of the metabolic pathway that results in the production of Limonene from Acetyl-CoA. 
 
 * [Biological_Intuition.ipynb](Biological_Intution.ipynb) - Generates Data to Reproduce Figure 9 From the Paper.
 
-* [Biological Inutition Plots.ipynb](Biological\ Inutition\ Plots.ipynb) - Creates the Plots for Figure 9 of the Paper.  
+* [Biological Inutition Plots.ipynb](Biological%20Inutition%20Plots.ipynb) - Creates the Plots for Figure 9 of the Paper.  
