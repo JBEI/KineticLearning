@@ -1,6 +1,3 @@
-
-# coding: utf-8
-
 # # A Simplified Version of the Kinetic Learning Algorithm
 # 
 # There was a bunch of kruft in the old kinetic learning source code.  I boiled it down into its key components and simplified the data structures.  Now the code is more managable, understandable, and extensible.
@@ -9,8 +6,6 @@
 # 1. Add Smoothing to Data Augmentation as an Option.
 # 2. Add a Random Seed Input
 # 3. Remove Warning From Import!
-
-# In[ ]:
 
 import pandas as pd
 from IPython.display import display
@@ -23,16 +18,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-# In[ ]:
-
 #Decorators
 def evenly_space(fun,times):
     '''Decorate Functions that require even spacing.'''
-    
     pass
 
-
-# In[ ]:
 
 def read_timeseries_data(csv_path,states,controls,impute=True,
                      time='Time',strain='Strain',augment=None,
@@ -47,37 +37,40 @@ def read_timeseries_data(csv_path,states,controls,impute=True,
     '''
     
     #Load Raw Data
-    raw_df = pd.read_csv(csv_path)
+    df = pd.read_csv(csv_path)
     
     #Remove Unused Columns
-    raw_df = raw_df[[strain,time] + states+controls]    
+    df = df[[strain,time] + states+controls]    
 
+    #Set Time Column to Float
+    
     #Standardize Index Names to Strain & Time
-    raw_df.columns = [['Strain','Time']+states+controls]
-
+    df.columns = ['Strain','Time']+states+controls
+    
     #MultiIndex Columns
-    raw_df = raw_df.set_index(['Strain','Time'])
+    df = df.set_index(['Strain','Time'])
     columns = [('states',state) for state in states] + [('controls',control) for control in controls]
-    raw_df.columns = pd.MultiIndex.from_tuples(columns)            
+    df.columns = pd.MultiIndex.from_tuples(columns)            
     
     #Sample num_strains Without Replacement
     if n is not None:
-        strains = np.random.choice(raw_df.reset_index()['Strain'].unique(),size=n)
-        raw_df = raw_df.loc[raw_df.index.get_level_values(0).isin(strains)]
+        strains = np.random.choice(df.reset_index()['Strain'].unique(),size=n)
+        df = df.loc[df.index.get_level_values(0).isin(strains)]
     
     #Impute NaN Values using Interpolation
     if impute:
-        tsdf = raw_df.groupby('Strain').apply(lambda group: group.interpolate())
+        df = df.groupby('Strain').apply(lambda group: group.interpolate())
     
     #Augment the data using an interpolation scheme
     if augment is not None:
-        tsdf = augment_data(tsdf,n=augment)
+        df = augment_data(df,n=augment)
     
     #Estimate the Derivative
     if est_derivative:
-        tsdf = estimate_state_derivative(tsdf)
+        df = estimate_state_derivative(df)
     
-    return tsdf
+    return df
+
 
 def augment_data(tsdf,n=200):
     '''Augment the time series data for improved fitting.
@@ -175,7 +168,6 @@ def check_derivative(tsdf):
             plt.show()
 
 
-# In[ ]:
 
 class dynamic_model(object):
     '''A MultiOutput Dynamic Model created from TPOT'''
@@ -184,13 +176,18 @@ class dynamic_model(object):
         self.tsdf = tsdf
 
     
-    def search(self,generations=50,population_size=30):
+    def search(self,generations=50,population_size=30,verbose=False):
         '''Find the best model that fits the data with TPOT.'''
         
         X = self.tsdf[['states','controls']].values
         
+        if verbose:
+            verbosity = 2
+        else:
+            verbosity = 0
+        
         def fit_single_output(row):
-            tpot = TPOTRegressor(generations=generations, population_size=population_size, verbosity=2,n_jobs=1)
+            tpot = TPOTRegressor(generations=generations, population_size=population_size, verbosity=verbosity,n_jobs=1)
             fit_model = tpot.fit(X,row).fitted_pipeline_
             return fit_model
     
@@ -227,10 +224,10 @@ class dynamic_model(object):
         pass
 
 
-# In[ ]:
 
 # New Stiff Integrator
-def odeintz(fun,y0,times,tolerance=1e-4):
+def odeintz(fun,y0,times,tolerance=1e-4,verbose=False):
+    '''Stiff Integrator for Integrating over Machine Learning Models'''
     maxDelta = 10
     
     f = lambda t,x: fun(x,t)
@@ -255,16 +252,15 @@ def odeintz(fun,y0,times,tolerance=1e-4):
                 
             value = r.integrate(r.t + dt)
             curTime = r.t
-            #print(curTime, end='\r')
-            #sleep(0.001)
+            if verbose:
+                print(curTime, end='\r')
+                sleep(0.001)
             f.value = curTime
         x.append(value)
     return x
 
 
-# In[ ]:
-
-def learn_dynamics(df,generations=50,population_size=30):
+def learn_dynamics(df,generations=50,population_size=30,verbose=False):
     '''Find system dynamics Time Series Data.
     
     Take in a Data Frame containing time series data 
@@ -273,12 +269,12 @@ def learn_dynamics(df,generations=50,population_size=30):
     
     #Fit Model
     model = dynamic_model(df)
-    model.search(generations=generations,population_size=population_size)
+    model.search(generations=generations,population_size=population_size,verbose=False)
     
     return model
 
 
-def simulate_dynamics(model,strain_df,time_points=None,tolerance=1e-4):
+def simulate_dynamics(model,strain_df,time_points=None,tolerance=1e-4,verbose=False):
     '''Use Learned Dynamics to Generate a Simulated Trajectory in the State Space'''
     display(strain_df)
     times = strain_df.index.get_level_values(1)
@@ -302,4 +298,3 @@ def simulate_dynamics(model,strain_df,time_points=None,tolerance=1e-4):
     #display(trajectory_df)
     
     return trajectory_df
-
