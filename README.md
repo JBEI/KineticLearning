@@ -12,4 +12,4 @@ Install the correct dependencies for the project, open the notebook of interest.
 # Installation
 
 
-*This code distributed under the license specified in the License.pdf file and is patent pending. The objective of the license is to make it freely available for academic and personal use.*
+*This code distributed under the license specified in the License.pdf file and is Patent Pending. The objective of the license is to make it freely available for academic and personal use.*
