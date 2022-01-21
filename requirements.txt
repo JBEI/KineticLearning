@@ -4,6 +4,6 @@ scipy==1.0.0
 networkx==1.11
 matplotlib==2.0.2
 pandas==0.22.0
-ipython==6.4.0
+ipython==7.16.3
 seaborn==0.8.1
 scikit_learn==0.19.1
